@@ -1,27 +1,70 @@
 body {
-  font-family: sans-serif;
-  text-align: center;
-  background: #111;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #141e30, #243b55);
   color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 15px;
+  width: 500px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 20px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 button {
-  padding: 10px 20px;
-  margin: 10px;
-  background: crimson;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
-  color: white;
+  font-weight: bold;
   cursor: pointer;
+  background: #ff4757;
+  color: white;
+  transition: 0.2s;
 }
 
 button:hover {
-  background: darkred;
+  transform: scale(1.05);
+  background: #ff6b81;
 }
 
 #log {
   margin-top: 20px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.3);
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.log-entry {
+  margin-bottom: 5px;
+  padding: 5px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }

@@ -1,14 +1,34 @@
 const log = document.getElementById("log");
+const socket = new WebSocket(`ws://${window.location.host}`);
+
+socket.onopen = () => {
+  addLog("🟢 Connected to server");
+};
+
+socket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data.type === "INFO") {
+    addLog("ℹ " + data.message);
+    return;
+  }
+
+  addLog(`🔥 ${data.username} → ${data.type}`);
+};
+
+socket.onerror = () => {
+  addLog("🔴 WebSocket error");
+};
 
 async function sendEvent(type) {
   const username = document.getElementById("username").value;
 
   if (!username) {
-    alert("Entre ton nom !");
+    alert("Enter your name!");
     return;
   }
 
-  const response = await fetch("/api/events", {
+  await fetch("/api/events", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -17,14 +37,11 @@ async function sendEvent(type) {
       payload: {}
     })
   });
-
-  const data = await response.json();
-
-  addLog(`Event envoyé: ${type}`);
 }
 
 function addLog(message) {
   const div = document.createElement("div");
+  div.className = "log-entry";
   div.textContent = message;
   log.prepend(div);
 }

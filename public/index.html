@@ -5,17 +5,22 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Arena Chaos</h1>
 
-  <input id="username" placeholder="Ton nom" />
+  <div class="container">
+    <h1>🔥 Arena Chaos Control</h1>
 
-  <div class="buttons">
-    <button onclick="sendEvent('SPAWN_ENEMY')">Spawn Enemy</button>
-    <button onclick="sendEvent('BOOST_PLAYER')">Boost Player</button>
-    <button onclick="sendEvent('FREEZE_PLAYER')">Freeze Player</button>
+    <input id="username" placeholder="Enter your name..." />
+
+    <div class="buttons">
+      <button onclick="sendEvent('SPAWN_ENEMY')">👾 Spawn Enemy</button>
+      <button onclick="sendEvent('BOOST_PLAYER')">⚡ Boost Player</button>
+      <button onclick="sendEvent('FREEZE_PLAYER')">❄ Freeze Player</button>
+      <button onclick="sendEvent('METEOR_SHOWER')">☄ Meteor Shower</button>
+    </div>
+
+    <h2>📡 Live Event Feed</h2>
+    <div id="log"></div>
   </div>
-
-  <div id="log"></div>
 
   <script src="app.js"></script>
 </body>
