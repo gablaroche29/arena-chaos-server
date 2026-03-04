@@ -1,0 +1,27 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #111;
+  color: white;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  background: crimson;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: darkred;
+}
+
+#log {
+  margin-top: 20px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}

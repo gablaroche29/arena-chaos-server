@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Arena Chaos Control</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Arena Chaos</h1>
+
+  <input id="username" placeholder="Ton nom" />
+
+  <div class="buttons">
+    <button onclick="sendEvent('SPAWN_ENEMY')">Spawn Enemy</button>
+    <button onclick="sendEvent('BOOST_PLAYER')">Boost Player</button>
+    <button onclick="sendEvent('FREEZE_PLAYER')">Freeze Player</button>
+  </div>
+
+  <div id="log"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
