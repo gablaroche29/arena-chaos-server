@@ -15,7 +15,7 @@ db.exec(`
         name TEXT NOT NULL,
         processed INTEGER DEFAULT 0,
         vote_count INTEGER DEFAULT 0,
-        vote_required INTEGER DEFAULT 3,
+        vote_required INTEGER DEFAULT 1,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE TABLE IF NOT EXISTS votes (

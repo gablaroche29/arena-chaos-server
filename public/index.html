@@ -1,242 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Arena Chaos Control</title>
+  <meta charset="UTF-8" />
+  <title>Arena Chaos Control</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-900 text-white min-h-screen">
+  <div class="max-w-7xl mx-auto p-6">
+    <h1 class="text-3xl font-bold text-orange-400 mb-8">
+      Arena Chaos Control
+    </h1>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- EVENTS -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Enemy Events -->
+        <div class="bg-gray-800 p-5 rounded-xl">
+          <h2 class="text-xl font-semibold mb-4 text-red-400">
+            Enemy Events
+          </h2>
+          <div class="space-y-3">
 
-<div class="max-w-7xl mx-auto p-6">
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">Spawn Enemy</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_SPAWN_ENEMY">0</span>
+                </div>
+              </div>
 
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-8">
-    <h1 class="text-3xl font-bold text-orange-400">🔥 Arena Chaos Control</h1>
+              <button
+                onclick="vote('SPAWN_ENEMY')"
+                class="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+              >
+                Vote
+              </button>
+            </div>
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">Spawn Boss</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_SPAWN_BOSS">0</span>
+                </div>
+              </div>
 
-    <div class="flex items-center gap-3">
-      <input
-        id="username"
-        placeholder="Enter your name..."
-        class="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-white"
-      />
-      <span class="text-sm text-gray-400">Connected User</span>
+              <button
+                onclick="vote('SPAWN_BOSS')"
+                class="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+              >
+                Vote
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Arena Events -->
+        <div class="bg-gray-800 p-5 rounded-xl">
+          <h2 class="text-xl font-semibold mb-4 text-purple-400">
+            Arena Events
+          </h2>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">Spike Trap</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_SPIKE_TRAP">0</span>
+                </div>
+              </div>
+
+              <button
+                onclick="vote('SPIKE_TRAP')"
+                class="bg-purple-500 px-3 py-1 rounded hover:bg-purple-600"
+              >
+                Vote
+              </button>
+            </div>
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">Lava Pool</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_LAVA_POOL">0</span>
+                </div>
+              </div>
+
+              <button
+                onclick="vote('LAVA_POOL')"
+                class="bg-purple-500 px-3 py-1 rounded hover:bg-purple-600"
+              >
+                Vote
+              </button>
+            </div>
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">Explosion</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_EXPOLOSION">0</span>
+                </div>
+              </div>
+
+              <button
+                onclick="vote('EXPLOSION')"
+                class="bg-purple-500 px-3 py-1 rounded hover:bg-purple-600"
+              >
+                Vote
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Player Events -->
+        <div class="bg-gray-800 p-5 rounded-xl">
+          <h2 class="text-xl font-semibold mb-4 text-purple-400">
+            Player Events
+          </h2>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">Heal</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_HEAL">0</span>
+                </div>
+              </div>
+              <button
+                onclick="vote('HEAL')"
+                class="bg-purple-500 px-3 py-1 rounded hover:bg-purple-600"
+              >
+                Vote
+              </button>
+            </div>
+            <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
+              <div>
+                <div class="font-semibold">SPEED_BOOST</div>
+                <div class="text-sm text-gray-400">
+                  Votes:
+                  <span id="votes_SPEED_BOOST">0</span>
+                </div>
+              </div>
+
+              <button
+                onclick="vote('SPEED_BOOST')"
+                class="bg-purple-500 px-3 py-1 rounded hover:bg-purple-600"
+              >
+                Vote
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- SIDE PANEL -->
+      <div class="space-y-6">
+        <div class="bg-gray-800 p-5 rounded-xl">
+          <h2 class="text-lg font-semibold text-orange-400 mb-3">
+            🎯 Triggered Events
+          </h2>
+          <div
+            id="triggeredEvents"
+            class="space-y-2 text-sm max-h-60 overflow-y-auto"
+          ></div>
+        </div>
+        <div class="bg-gray-800 p-5 rounded-xl">
+          <h2 class="text-lg font-semibold text-blue-400 mb-3">
+            📡 Live Event Feed
+          </h2>
+          <div
+            id="log"
+            class="space-y-2 text-sm max-h-60 overflow-y-auto"
+          ></div>
+        </div>
+      </div>
     </div>
   </div>
 
-
-  <!-- Layout -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- EVENTS -->
-    <div class="lg:col-span-2 space-y-6">
-
-      <!-- Enemy Events -->
-      <div class="bg-gray-800 p-5 rounded-xl shadow-lg">
-        <h2 class="text-xl font-semibold mb-4 text-red-400">👾 Enemy Events</h2>
-
-        <div class="space-y-3">
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Spawn Goblin</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_spawn_goblin">0</span></div>
-            </div>
-            <button onclick="sendEvent('SPAWN_GOBLIN')" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Spawn Fast Enemy</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_fast_enemy">0</span></div>
-            </div>
-            <button onclick="sendEvent('SPAWN_FAST_ENEMY')" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Spawn Boss</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_spawn_boss">0</span></div>
-            </div>
-            <button onclick="sendEvent('SPAWN_BOSS')" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- Arena Events -->
-      <div class="bg-gray-800 p-5 rounded-xl shadow-lg">
-        <h2 class="text-xl font-semibold mb-4 text-yellow-400">🏟 Arena Events</h2>
-
-        <div class="space-y-3">
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Spawn Spike Trap</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_spike">0</span></div>
-            </div>
-            <button onclick="sendEvent('SPIKE_TRAP')" class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Spawn Lava Pool</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_lava">0</span></div>
-            </div>
-            <button onclick="sendEvent('LAVA_POOL')" class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Spawn Turret</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_turret">0</span></div>
-            </div>
-            <button onclick="sendEvent('TURRET')" class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- Chaos Events -->
-      <div class="bg-gray-800 p-5 rounded-xl shadow-lg">
-        <h2 class="text-xl font-semibold mb-4 text-purple-400">🌪 Chaos Events</h2>
-
-        <div class="space-y-3">
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Random Explosion</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_explosion">0</span></div>
-            </div>
-            <button onclick="sendEvent('RANDOM_EXPLOSION')" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Earthquake</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_earthquake">0</span></div>
-            </div>
-            <button onclick="sendEvent('EARTHQUAKE')" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Meteor</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_meteor">0</span></div>
-            </div>
-            <button onclick="sendEvent('METEOR')" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Wind Push</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_wind">0</span></div>
-            </div>
-            <button onclick="sendEvent('WIND_PUSH')" class="bg-purple-500 hover:bg-purple-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-
-      <!-- Player Effects -->
-      <div class="bg-gray-800 p-5 rounded-xl shadow-lg">
-        <h2 class="text-xl font-semibold mb-4 text-green-400">🎮 Player Effects</h2>
-
-        <div class="space-y-3">
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Heal Player</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_heal">0</span></div>
-            </div>
-            <button onclick="sendEvent('HEAL_PLAYER')" class="bg-green-500 hover:bg-green-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Speed Boost</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_speed">0</span></div>
-            </div>
-            <button onclick="sendEvent('SPEED_BOOST')" class="bg-green-500 hover:bg-green-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Slow Player</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_slow">0</span></div>
-            </div>
-            <button onclick="sendEvent('SLOW_PLAYER')" class="bg-green-500 hover:bg-green-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center bg-gray-700 p-3 rounded">
-            <div>
-              <div class="font-semibold">Invert Controls</div>
-              <div class="text-sm text-gray-400">Votes: <span id="votes_invert">0</span></div>
-            </div>
-            <button onclick="sendEvent('INVERT_CONTROLS')" class="bg-green-500 hover:bg-green-600 px-3 py-1 rounded">
-              Vote
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-
-    <!-- SIDE PANEL -->
-    <div class="space-y-6">
-
-      <!-- Triggered Events -->
-      <div class="bg-gray-800 p-5 rounded-xl shadow-lg">
-        <h2 class="text-lg font-semibold text-orange-400 mb-3">🎯 Triggered Events</h2>
-        <div id="triggeredEvents" class="space-y-2 text-sm max-h-60 overflow-y-auto"></div>
-      </div>
-
-      <!-- Live Feed -->
-      <div class="bg-gray-800 p-5 rounded-xl shadow-lg">
-        <h2 class="text-lg font-semibold text-blue-400 mb-3">📡 Live Event Feed</h2>
-        <div id="log" class="space-y-2 text-sm max-h-60 overflow-y-auto"></div>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<script src="app.js"></script>
-
+  <script src="app.js"></script>
 </body>
 </html>
