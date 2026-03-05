@@ -84,17 +84,17 @@ router.post("/vote", (req, res) => {
       SET processed = 1
       WHERE id = ?
     `).run(event.id);
-        const voters = db.prepare(`
+        const users = db.prepare(`
       SELECT username
       FROM users
       JOIN votes ON users.id = votes.user_id
       WHERE votes.event_id = ?
     `).all(event.id);
 
-        const voterNames = voters.map(v => v.username);
+        const voterNames = users.map(v => v.username);
         const triggeredEvent = {
             type: event.type,
-            voters: voterNames
+            users: voterNames
         };
 
         broadcast({

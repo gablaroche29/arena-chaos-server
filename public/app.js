@@ -26,9 +26,9 @@ socket.onmessage = (event) => {
   }
 
   if (data.type === "EVENT_TRIGGERED") {
-    const { type, voters } = data.event;
+    const { type, users } = data.event;
     addLog(`🔥 ${type} triggered`);
-    addTriggered(type, voters);
+    addTriggered(type, users);
     const voteElement = document.getElementById(`votes_${type}`);
     if (voteElement) {
       voteElement.textContent = `0`;
@@ -58,12 +58,12 @@ function addLog(message) {
   log.prepend(div);
 }
 
-function addTriggered(type, voters) {
+function addTriggered(type, users) {
   const div = document.createElement("div");
   div.className = "bg-orange-600 px-3 py-2 rounded";
   div.innerHTML = `
     <div class="font-semibold">${type}</div>
-    <div class="text-xs text-gray-200">by ${voters.join(", ")}</div>
+    <div class="text-xs text-gray-200">by ${users.join(", ")}</div>
   `;
   triggered.prepend(div);
 }
