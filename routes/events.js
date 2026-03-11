@@ -26,7 +26,7 @@ function getOrCreateEvent(type) {
 // ─── POST /vote ───────────────────────────────────────────────────────────────
 
 router.post("/vote", (req, res) => {
-    const username = req.session.username;
+    const username = req.session.username ?? req.headers["x-sim-username"];
     const { type } = req.body;
 
     if (!username || !type) {

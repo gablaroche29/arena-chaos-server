@@ -4,9 +4,10 @@ import http from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import authRoutes from "./routes/auth.js";
 import { protect } from "./middleware/auth.js";
+import authRoutes from "./routes/auth.js";
 import eventsRoutes from "./routes/events.js";
+import simulateRouter from "./routes/simulate.js";
 import { initWebSocket } from "./websocket/wsServer.js";
 
 const app = express();
@@ -14,7 +15,7 @@ const server = http.createServer(app);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 app.use(session({
-    secret: "vault-tec-key", 
+    secret: "vault-tec-key",
     resave: false,
     saveUninitialized: false
 }));
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, "public"), { index: false }));
 
 app.use("/api/events", protect, eventsRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/simulate", simulateRouter);
 
 initWebSocket(server);
 
