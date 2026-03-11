@@ -9,15 +9,15 @@
 const EVENTS = {
     SPAWN_ENEMY: {
         name: "Spawn Enemy",
-        vote_required: 2,
+        vote_required: 4,
     },
     SPIKE_TRAP: {
         name: "Spike Trap",
-        vote_required: 2,
+        vote_required: 6,
     },
     EXPLOSION: {
         name: "Explosion",
-        vote_required: 2,
+        vote_required: 10,
     },
 };
 
