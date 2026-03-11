@@ -37,4 +37,9 @@ router.get("/logout", (req, res) => {
     res.redirect("/auth");
 });
 
+router.get('/me', (req, res) => {
+    if (!req.session.username) return res.status(401).json({});
+    res.json({ username: req.session.username });
+});
+
 export default router;
