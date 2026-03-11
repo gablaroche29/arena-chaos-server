@@ -11,7 +11,7 @@ const EVENTS = {
         name: "Spawn Enemy",
         vote_required: 4,
     },
-    SPIKE_TRAP: {
+    SPAWN_TRAP: {
         name: "Spike Trap",
         vote_required: 6,
     },
