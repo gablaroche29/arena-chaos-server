@@ -1,115 +1,124 @@
 import express from "express";
 import db from "../config/database.js";
+import EVENTS from "../config/events.js";
 import { broadcast } from "../websocket/wsServer.js";
 
 const router = express.Router();
 
+function getOrCreateEvent(type) {
+    const config = EVENTS[type];
+
+    db.prepare(`
+        INSERT OR IGNORE INTO events (type, name, vote_required)
+        SELECT ?, ?, ?
+        WHERE NOT EXISTS (
+            SELECT 1 FROM events WHERE type = ? AND processed = 0
+        )
+    `).run(type, config.name, config.vote_required, type);
+
+    return db.prepare(`
+        SELECT * FROM events
+        WHERE type = ? AND processed = 0
+        LIMIT 1
+    `).get(type);
+}
+
+// ─── POST /vote ───────────────────────────────────────────────────────────────
+
 router.post("/vote", (req, res) => {
     const username = req.session.username;
     const { type } = req.body;
+
     if (!username || !type) {
         return res.status(400).json({ error: "Missing username or event type" });
     }
 
-    let user = db.prepare(`
-    SELECT * FROM users WHERE username = ?
-  `).get(username);
-
-    if (!user) {
-        const result = db.prepare(`
-            INSERT INTO users (username)
-            VALUES (?)
-    `).run(username);
-        user = {
-            id: result.lastInsertRowid,
-            username
-        };
+    // Reject unknown event types outright
+    if (!EVENTS[type]) {
+        return res.status(400).json({ error: "Unknown event type" });
     }
 
-    let event = db.prepare(`
-        SELECT * FROM events
-        WHERE type = ? AND processed = 0
-        LIMIT 1
-  `).get(type);
+    // Ensure the user row exists
+    db.prepare(`
+        INSERT OR IGNORE INTO users (username) VALUES (?)
+    `).run(username);
+
+    const user = db.prepare(`
+        SELECT * FROM users WHERE username = ?
+    `).get(username);
+
+    // Get or create the active event row (race-safe)
+    const event = getOrCreateEvent(type);
 
     if (!event) {
-        const result = db.prepare(`
-      INSERT INTO events (type, name)
-      VALUES (?, ?)
-    `).run(type, type);
-
-        event = db.prepare(`
-      SELECT * FROM events WHERE id = ?
-    `).get(result.lastInsertRowid);
+        // Shouldn't happen, but guard anyway
+        return res.status(500).json({ error: "Could not resolve event" });
     }
 
-    try {
-        db.prepare(`
-      INSERT INTO votes (user_id, event_id)
-      VALUES (?, ?)
+    // Record the vote — UNIQUE(user_id, event_id) prevents double-voting
+    const voteResult = db.prepare(`
+        INSERT OR IGNORE INTO votes (user_id, event_id)
+        VALUES (?, ?)
     `).run(user.id, event.id);
-    } catch (err) {
-        return res.json({
-            message: "Already voted",
-            event
-        });
+
+    if (voteResult.changes === 0) {
+        // User already voted on this active event
+        return res.json({ message: "Already voted", event });
     }
 
+    // Recount and update
     const voteCount = db.prepare(`
-    SELECT COUNT(*) as count
-    FROM votes
-    WHERE event_id = ?
-  `).get(event.id).count;
+        SELECT COUNT(*) as count FROM votes WHERE event_id = ?
+    `).get(event.id).count;
 
     db.prepare(`
-    UPDATE events
-    SET vote_count = ?
-    WHERE id = ?
-  `).run(voteCount, event.id);
+        UPDATE events SET vote_count = ? WHERE id = ?
+    `).run(voteCount, event.id);
 
-    event.vote_count = voteCount;
     broadcast({
         type: "VOTE_UPDATE",
         event: {
             id: event.id,
             type: event.type,
             vote_count: voteCount,
-            vote_required: event.vote_required
-        }
+            vote_required: event.vote_required,
+        },
     });
 
-    if (voteCount >= event.vote_required && event.processed === 0) {
-        db.prepare(`
-      UPDATE events
-      SET processed = 1
-      WHERE id = ?
-    `).run(event.id);
-        const users = db.prepare(`
-      SELECT username
-      FROM users
-      JOIN votes ON users.id = votes.user_id
-      WHERE votes.event_id = ?
-    `).all(event.id);
+    // ── Trigger check ──────────────────────────────────────────────────────────
+    // Use a conditional UPDATE so only one request "wins" the trigger,
+    // even under concurrent load.
 
-        const voterNames = users.map(v => v.username);
-        const triggeredEvent = {
-            type: event.type,
-            users: voterNames
-        };
+    if (voteCount >= event.vote_required) {
+        const triggerResult = db.prepare(`
+            UPDATE events
+            SET processed = 1
+            WHERE id = ? AND processed = 0
+        `).run(event.id);
 
-        broadcast({
-            type: "EVENT_TRIGGERED",
-            event: triggeredEvent
-        });
+        if (triggerResult.changes === 1) {
+            // This request won the trigger race
+            const voters = db.prepare(`
+                SELECT username FROM users
+                JOIN votes ON users.id = votes.user_id
+                WHERE votes.event_id = ?
+            `).all(event.id);
 
-        console.log("🔥 Event triggered:", triggeredEvent);
+            const triggeredEvent = {
+                type: event.type,
+                users: voters.map(v => v.username),
+            };
+
+            broadcast({
+                type: "EVENT_TRIGGERED",
+                event: triggeredEvent,
+            });
+
+            console.log("🔥 Event triggered:", triggeredEvent);
+        }
     }
 
-    res.json({
-        success: true,
-        event
-    });
-
+    res.json({ success: true, event });
 });
 
 export default router;
