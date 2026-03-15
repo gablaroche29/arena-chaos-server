@@ -18,6 +18,6 @@ jobs:
           script: |
             cd arena-chaos-server
             git pull origin main
-            bun install
-            bun run build
-            pm2 restart arena-chaos-server
+            /home/etudiant/.bun/bin/bun install
+            /home/etudiant/.bun/bin/bun run build
+            /home/etudiant/.bun/bin/pm2 restart arena-chaos-server
