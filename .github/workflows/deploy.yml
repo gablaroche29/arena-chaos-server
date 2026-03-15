@@ -19,5 +19,4 @@ jobs:
             cd arena-chaos-server
             git pull origin main
             /home/etudiant/.bun/bin/bun install
-            /home/etudiant/.bun/bin/bun run build
             /home/etudiant/.bun/bin/pm2 restart arena-chaos-server
