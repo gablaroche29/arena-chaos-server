@@ -1,22 +1,23 @@
 {
-  "name": "arena-chaos-server",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "dev": "node server.js"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "better-sqlite3": "^12.6.2",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "ws": "^8.19.0"
-  }
+    "name": "arena-chaos-server",
+    "module": "index.js",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "node index.js",
+        "start": "node index.js"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "better-sqlite3": "^12.6.2",
+        "cors": "^2.8.6",
+        "express": "^5.2.1",
+        "express-session": "^1.19.0",
+        "ws": "^8.19.0"
+    }
 }
