@@ -141,7 +141,8 @@ window.addEventListener('pagehide', saveTokenState);
 
 // ─── WebSocket ────────────────────────────────────────────────────────────────
 
-const socket = new WebSocket(`wss://${window.location.host}`);
+const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+const socket = new WebSocket(`${protocol}://${window.location.host}`);
 
 socket.onopen = () => {
     document.getElementById('ws-status').textContent = 'CONNECTED';
@@ -179,24 +180,15 @@ socket.onmessage = (event) => {
 
 // ─── Vote display helpers ─────────────────────────────────────────────────────
 
-const voteCounts = {};
-
 function updateVoteDisplay(type, count, required) {
     const voteEl = document.getElementById(`votes_${type}`);
-    if (voteEl) {
-        voteEl.textContent = required != null ? `${count} / ${required}` : count;
-    }
-
-    voteCounts[type] = count;
-    const maxRef = required != null ? required : Math.max(...Object.values(voteCounts), 1);
-
-    for (const key in voteCounts) {
-        const bar = document.getElementById(`bar_${key}`);
-        if (bar) {
-            const pct = Math.min((voteCounts[key] / maxRef) * 100, 100);
-            bar.style.width = pct + '%';
-        }
-    }
+    if (!voteEl) { return; }
+    voteEl.textContent = required != null ? `${count} / ${required}` : count;
+    const barEl = document.getElementById(`bar_${type}`);
+    if (!barEl) { return; }
+    const pct = count / required * 100;
+    barEl.style.width = pct + '%';
+    console.log("Vote:", type, count, required, pct);
 }
 
 // ─── Vote action ──────────────────────────────────────────────────────────────
