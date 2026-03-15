@@ -75,6 +75,10 @@ function migrateToUserKey(username) {
 let tokens = MAX_TOKENS;
 let regenStart = null;
 
+// Tracks which event types the current user has already voted on this round.
+// Cleared per-event when EVENT_TRIGGERED fires for that event.
+const votedEvents = new Set();
+
 function setTokens(n) {
     tokens = Math.min(MAX_TOKENS, Math.max(0, n));
     renderTokens();
@@ -108,6 +112,22 @@ function setVoteButtonsDisabled(disabled) {
     document.querySelectorAll('.btn-vote').forEach(btn => {
         btn.disabled = disabled;
     });
+    // After any enable pass, re-lock every button the user already voted on.
+    // This runs even when disabled=true (harmless) so the logic is always consistent.
+    reapplyVotedLocks();
+}
+
+function reapplyVotedLocks() {
+    votedEvents.forEach(type => {
+        const btn = document.getElementById(`btn_${type}`);
+        if (btn) btn.disabled = true;
+    });
+}
+
+function setVoteButtonDisabled(disabled, type) {
+    const btnEl = document.getElementById(`btn_${type}`);
+    if (!btnEl) { return; }
+    btnEl.disabled = disabled;
 }
 
 // ─── Regen ticker — runs every 100 ms ─────────────────────────────────────────
@@ -170,10 +190,14 @@ socket.onmessage = (event) => {
 
     if (data.type === 'EVENT_TRIGGERED') {
         const { type } = data.event;
+        // Reset vote count display
         const voteEl = document.getElementById(`votes_${type}`);
         if (voteEl) voteEl.textContent = '0';
         const barEl = document.getElementById(`bar_${type}`);
         if (barEl) barEl.style.width = '0%';
+        // Clear voted state for this event so the user can vote again next round
+        votedEvents.delete(type);
+        setVoteButtonDisabled(false, type);
         return;
     }
 };
@@ -188,19 +212,42 @@ function updateVoteDisplay(type, count, required) {
     if (!barEl) { return; }
     const pct = count / required * 100;
     barEl.style.width = pct + '%';
-    console.log("Vote:", type, count, required, pct);
 }
 
 // ─── Vote action ──────────────────────────────────────────────────────────────
 
 async function vote(type) {
+    if (votedEvents.has(type)) return;
     if (!consumeToken()) return;
 
-    await fetch('/api/events/vote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type }),
-    });
+    // Lock the button immediately — before the fetch — so rapid double-clicks
+    // don't sneak a second vote through while the request is in flight.
+    votedEvents.add(type);
+    setVoteButtonDisabled(true, type);
+
+    try {
+        const res = await fetch('/api/events/vote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type }),
+        });
+
+        if (res.status === 409) {
+            // Backend says already voted — button stays locked, but refund the token
+            // since the vote wasn't actually counted.
+            setTokens(tokens + 1);
+        } else if (!res.ok) {
+            // Any other server error — roll back so the user can retry
+            votedEvents.delete(type);
+            setVoteButtonDisabled(false, type);
+            setTokens(tokens + 1);
+        }
+    } catch (_) {
+        // Network error — roll back so the user can retry
+        votedEvents.delete(type);
+        setVoteButtonDisabled(false, type);
+        setTokens(tokens + 1);
+    }
 }
 
 // ─── Load player info from session ───────────────────────────────────────────
